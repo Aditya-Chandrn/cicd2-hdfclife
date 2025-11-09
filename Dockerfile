@@ -1,6 +1,6 @@
 # ---- Stage 1: Build ----
 # Use a JDK image to build the application
-FROM eclipse-temurin:17-jdk-alpine AS builder
+FROM eclipse-temurin:21-jdk-alpine AS builder
 
 # Set the working directory
 WORKDIR /app
@@ -21,7 +21,7 @@ RUN ./mvnw package -DskipTests
 
 # ---- Stage 2: Runtime ----
 # Use a smaller JRE-only image for the final container
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
