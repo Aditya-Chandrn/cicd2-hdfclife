@@ -1,0 +1,11 @@
+# Ignore build artifacts
+target/
+
+# Ignore Git and GitHub files
+.git/
+.github/
+
+# Ignore IDE files
+.idea/
+*.iml
+.vscode/
