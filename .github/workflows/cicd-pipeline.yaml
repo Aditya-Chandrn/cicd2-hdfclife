@@ -1,0 +1,51 @@
+name: Java CI/CD with Maven, Docker, and GitHub Actions
+
+# Trigger the workflow on pushes to the main branch
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    # Run the job on the latest Ubuntu runner
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out the repository code
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # 2. Set up JDK 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven' # Cache Maven dependencies
+
+      # 3. Build and Test with Maven
+      # This step runs 'mvn test' as part of the 'package' lifecycle
+      # If tests fail, the 'mvnw' command will exit with an error
+      # and the pipeline will stop here.
+      - name: Build and Test with Maven
+        run: ./mvnw -B package
+        # -B (batch mode) is recommended for CI servers
+
+      # 4. Log in to Docker Hub
+      # Uses the secrets we configured in the GitHub repository
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 5. Build and push the Docker image
+      # This uses the Dockerfile in our repo to build the image
+      # and pushes it to Docker Hub
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .       # Use the current directory as build context
+          push: true       # Push the image after building
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/spring-boot-cicd:latest
+          # Replace 'spring-boot-demo' with your desired image name
